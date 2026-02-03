@@ -8,18 +8,18 @@
 
 **Challenge**: Engineering teams lack visibility into actual coding time across projects. Existing tools are either manual, locked to a single vendor, or don’t fit internal tooling workflows—and teams want to own their own data.
 
-**My Role**: Solo Product Engineer — conceived, architected, and shipped the complete extension: authentication flow, real-time tracking engine, database schema with Row Level Security, session recovery, and dashboard webview.
+**My Role**: Solo Product Engineer - conceived, architected, and shipped the complete extension: authentication flow, real-time tracking engine, database schema with Row Level Security, session recovery, and dashboard webview.
 
 **Approach**: Built a VS Code/Cursor extension designed so **any team with a Supabase project** can use it as internal developer tooling. GitHub OAuth for auth, editor event listeners for automatic activity detection with smart idle timeout, and RLS so each team’s data stays isolated in their own Supabase instance.
 
 **Results**:
-- ✅ **Team-owned data** — each team uses its own Supabase key; no shared SaaS backend, data stays in your infra
-- ✅ **Zero-friction onboarding** — authenticate with GitHub in 3 clicks, tracking starts automatically
-- ✅ **Cross-editor compatibility** — works in VS Code and Cursor IDE without modification
-- ✅ **Session resilience** — recovers active sessions after crashes or restarts
-- ✅ **Internal-tool ready** — multi-user support with RLS; safe for team-wide rollout
+- ✅ **Team-owned data** : each team uses its own Supabase key; no shared SaaS backend, data stays in your infra
+- ✅ **Zero-friction onboarding** : authenticate with GitHub in 3 clicks, tracking starts automatically
+- ✅ **Cross-editor compatibility** : works in VS Code and Cursor IDE without modification
+- ✅ **Session resilience** : recovers active sessions after crashes or restarts
+- ✅ **Internal-tool ready** : multi-user support with RLS; safe for team-wide rollout
 
-**Stack**: TypeScript, VS Code Extension API, Supabase (PostgreSQL + Row Level Security), GitHub OAuth, Mocha/Sinon
+**Stack**: TypeScript, VS Code Extension API, Supabase (PostgreSQL + Row Level Security), GitHub OAuth,.
 
 ---
 
@@ -30,16 +30,16 @@
 Engineering teams need visibility into how time is actually spent in the editor—for capacity planning, sprint retrospectives, and internal tooling—without adding manual timers or locking into a single vendor’s backend.
 
 Common pain points:
-1. **Manual friction** — starting/stopping timers is easy to forget; data is inconsistent
-2. **Vendor lock-in** — SaaS time trackers own your data and often don’t fit internal workflows
-3. **Privacy concerns** — teams (especially in regulated environments) don’t want invasive monitoring or keylogging
-4. **No “bring your own backend”** — few options let a team point the extension at their own Supabase (or similar) and keep data in-house
+1. **Manual friction** : starting/stopping timers is easy to forget; data is inconsistent.
+2. **Vendor lock-in** : SaaS time trackers own your data and often don’t fit internal workflows.
+3. **Privacy concerns** : teams (especially in regulated environments) don’t want invasive monitoring or keylogging.
+4. **No “bring your own backend”** : few options let a team point the extension at their own Supabase (or similar) and keep data in-house.
 
 The extension was conceived as **internal developer tooling**: any team with a Supabase project and a URL + anon key can run time tracking entirely on their own backend.
 
 ### Why This Matters
 
-Research suggests developers spend 35–50% of their time on non-coding activities (meetings, communication, environment issues). Without automatic tracking at the editor level, time estimates are guesswork and sprint planning suffers. For teams investing in internal tooling, having a single extension that works with their own Supabase reduces dependency on external SaaS and keeps data under their control.
+Research suggests developers spend 35-50% of their time on non-coding activities (meetings, communication, environment issues). Without automatic tracking at the editor level, time estimates are guesswork and sprint planning suffers. For teams investing in internal tooling, having a single extension that works with their own Supabase reduces dependency on external SaaS and keeps data under their control.
 
 ### Target Users
 
@@ -53,27 +53,27 @@ Research suggests developers spend 35–50% of their time on non-coding activiti
 
 ### Technical Constraints
 
-1. **Sandbox environment** — VS Code extensions run in isolated contexts with no access to:
+1. **Sandbox environment** : VS Code extensions run in isolated contexts with no access to:
    - Browser storage APIs (`localStorage`, `sessionStorage`, `IndexedDB`)
    - Native file system outside workspace
    - Direct HTTP calls without CORS
-2. **Editor compatibility** — must work across VS Code and Cursor without separate builds
-3. **Offline resilience** — tracking should continue during network outages
-4. **Performance** — cannot impact editor responsiveness or startup time
-5. **Security** — storing credentials safely without exposing to other extensions
+2. **Editor compatibility** : must work across VS Code and Cursor without separate builds
+3. **Offline resilience** : tracking should continue during network outages
+4. **Performance** : cannot impact editor responsiveness or startup time
+5. **Security** : storing credentials safely without exposing to other extensions
 
 ### Product Constraints
 
-1. **Zero-config ideal** — should work immediately after install without complex setup
-2. **Familiar authentication** — leverage existing GitHub identity (no new accounts)
-3. **Minimal UI surface** — integrate naturally into editor's existing UX patterns
-4. **Privacy-first** — track *time*, not *content* (no keylogging, no screen capture)
+1. **Zero-config ideal** : should work immediately after install without complex setup
+2. **Familiar authentication** : leverage existing GitHub identity (no new accounts)
+3. **Minimal UI surface** : integrate naturally into editor's existing UX patterns
+4. **Privacy-first** : track *time*, not *content* (no keylogging, no screen capture)
 
 ### Business Constraints
 
-1. **Bring-your-own Supabase** — no central backend; each team provisions its own Supabase project (free tier is sufficient for most teams)
-2. **Open source** — MIT licensed, so teams can adopt and adapt it as internal tooling
-3. **Solo development** — single engineer scope (no dedicated backend or hosted service to maintain)
+1. **Bring-your-own Supabase** : no central backend; each team provisions its own Supabase project (free tier is sufficient for most teams)
+2. **Open source** : MIT licensed, so teams can adopt and adapt it as internal tooling
+3. **Solo development** : single engineer scope (no dedicated backend or hosted service to maintain)
 
 ---
 
@@ -81,20 +81,20 @@ Research suggests developers spend 35–50% of their time on non-coding activiti
 
 ### Architecture Decision: Serverless-First, Team-Owned Backend
 
-**Decision**: Use Supabase (PostgreSQL + Row Level Security) as the backend—with **each team supplying its own Supabase project and key**. No shared SaaS backend; the extension is a client that works against any Supabase instance.
+**Decision**: Use Supabase (PostgreSQL + Row Level Security) as the backend-with **each team supplying its own Supabase project and key**. No shared SaaS backend; the extension is a client that works against any Supabase instance.
 
 **Why**:
-- **Internal tooling fit** — teams that already use or can spin up Supabase get time tracking without a separate hosted service; data stays in their project
-- **Time to market** — no need to build auth, database hosting, or API layer; Supabase free tier is enough for most teams
-- **Security** — Row Level Security enforces per-user data isolation at the database level (defense in depth)
-- **Cost** — $0/month for the extension itself; teams pay only for their own Supabase usage
+- **Internal tooling fit** : teams that already use or can spin up Supabase get time tracking without a separate hosted service; data stays in their project
+- **Time to market** : no need to build auth, database hosting, or API layer; Supabase free tier is enough for most teams
+- **Security** : Row Level Security enforces per-user data isolation at the database level (defense in depth)
+- **Cost** : $0/month for the extension itself; teams pay only for their own Supabase usage
 
 **Trade-offs**:
-- ✅ **Faster launch** — shipped in weeks instead of months
-- ✅ **No central backend to maintain** — no servers, no multi-tenant SaaS to operate
-- ✅ **Team ownership** — each team’s data lives in their Supabase; ideal for internal tooling
-- ❌ **Teams must provision Supabase** — requires one-time setup of project + URL + anon key per team
-- ❌ **Vendor lock-in at team level** — migrating away from Supabase would require export + schema changes per team
+- ✅ **Faster launch** : shipped in weeks instead of months
+- ✅ **No central backend to maintain** : no servers, no multi-tenant SaaS to operate
+- ✅ **Team ownership** : each team’s data lives in their Supabase; ideal for internal tooling
+- ❌ **Teams must provision Supabase** : requires one-time setup of project + URL + anon key per team
+- ❌ **Vendor lock-in at team level** : migrating away from Supabase would require export + schema changes per team
 
 **Alternatives considered**:
 - **Central hosted API**: Rejected; contradicts the goal of “any team with a Supabase key” and adds operational burden
@@ -108,10 +108,10 @@ Research suggests developers spend 35–50% of their time on non-coding activiti
 **Decision**: Use VS Code's built-in GitHub authentication instead of custom OAuth flow.
 
 **Why**:
-- **Zero friction** — developers already trust VS Code's GitHub integration
-- **No credential storage** — VS Code handles tokens securely via SecretStorage API
-- **Familiar UX** — same flow used by GitHub Copilot and other extensions
-- **Cross-platform** — works identically on Windows, macOS, Linux
+- **Zero friction** : developers already trust VS Code's GitHub integration
+- **No credential storage** : VS Code handles tokens securely via SecretStorage API
+- **Familiar UX** : same flow used by GitHub Copilot and other extensions
+- **Cross-platform** : works identically on Windows, macOS, Linux
 
 **Implementation**:
 
@@ -170,9 +170,9 @@ private setupIdleDetection() {
 **Configuration**: Users can adjust idle timeout (default: 5 minutes) via `timeTracker.idleTimeoutMinutes`.
 
 **Why this works**:
-- **Respects focus time** — long pauses for reading docs or thinking don't count as "idle"
-- **Catches distractions** — stepping away from desk stops tracking automatically
-- **Accurate internal metrics** — lunch breaks and long gaps don’t inflate team time reports
+- **Respects focus time** : long pauses for reading docs or thinking don't count as "idle"
+- **Catches distractions** : stepping away from desk stops tracking automatically
+- **Accurate internal metrics** : lunch breaks and long gaps don’t inflate team time reports
 
 ---
 
@@ -253,9 +253,9 @@ CREATE POLICY "Users can manage own data" ON time_entries
 ```
 
 **Why RLS matters**:
-- **Defense in depth** — even if API keys leak, users can't access each other's data
-- **Zero trust architecture** — security enforced at database layer, not application layer
-- **Audit compliance** — PostgreSQL logs all RLS violations
+- **Defense in depth** : even if API keys leak, users can't access each other's data
+- **Zero trust architecture** : security enforced at database layer, not application layer
+- **Audit compliance** : PostgreSQL logs all RLS violations
 
 **Real-world scenario**: If a developer accidentally commits the `SUPABASE_KEY` to GitHub, RLS prevents unauthorized data access (unlike traditional API key leaks).
 
@@ -354,9 +354,9 @@ async updateSession() {
 **Goal**: Visualize time tracking data in a webview panel.
 
 **Design choices**:
-- **No external frameworks** — vanilla HTML/CSS/JS to minimize bundle size
-- **Dark mode support** — uses VS Code's theme colors via CSS variables
-- **Aggregated views** — show daily, weekly, monthly breakdowns
+- **No external frameworks** : vanilla HTML/CSS/JS to minimize bundle size
+- **Dark mode support** : uses VS Code's theme colors via CSS variables
+- **Aggregated views** : show daily, weekly, monthly breakdowns
 
 **Communication pattern**: Webview ↔ Extension via message passing:
 
@@ -387,9 +387,9 @@ webviewPanel.webview.onDidReceiveMessage(async (message) => {
 
 **Testing strategy**:
 
-1. **Unit tests** (Mocha + Sinon) — mocked VS Code API for core logic
-2. **Integration tests** — used Extension Development Host to test real flows
-3. **Manual testing** — dogfooded the extension for 1 week on real projects
+1. **Unit tests** (Mocha + Sinon) : mocked VS Code API for core logic
+2. **Integration tests** : used Extension Development Host to test real flows
+3. **Manual testing** : dogfooded the extension for 1 week on real projects
 
 **Example unit test**:
 
@@ -437,7 +437,7 @@ describe('TimeTrackingService', () => {
 
 **Solution**: Documented Supabase’s security model for internal tooling:
 - **Anon key** is intended to be used in client apps (including browser and desktop); it is not a service-role secret
-- **Row Level Security** enforces permissions at the database level—each team’s Supabase project only exposes data according to RLS
+- **Row Level Security** enforces permissions at the database level-each team’s Supabase project only exposes data according to RLS
 - Even if the anon key is visible in settings, RLS prevents cross-user and cross-team access
 
 **Design decision**: No backend proxy to hide the key, because:
@@ -537,12 +537,12 @@ async flushUpdates() {
 
 ### Qualitative Outcomes
 
-✅ **Team-owned data** — any team with a Supabase project can use the extension as internal developer tooling; no shared SaaS backend  
-✅ **Seamless onboarding** — developers authenticate with GitHub and start tracking in under 30 seconds  
-✅ **Cross-editor support** — works identically in VS Code and Cursor without separate builds  
-✅ **Session resilience** — automatic recovery from crashes and restarts prevents data loss  
-✅ **Privacy-first approach** — tracks time, not content (no keylogging or screenshots)  
-✅ **Internal-tool ready** — RLS and multi-user support make it safe for team-wide rollout on a team’s own Supabase  
+✅ **Team-owned data** : any team with a Supabase project can use the extension as internal developer tooling; no shared SaaS backend  
+✅ **Seamless onboarding** : developers authenticate with GitHub and start tracking in under 30 seconds  
+✅ **Cross-editor support** : works identically in VS Code and Cursor without separate builds  
+✅ **Session resilience** : automatic recovery from crashes and restarts prevents data loss  
+✅ **Privacy-first approach** : tracks time, not content (no keylogging or screenshots)  
+✅ **Internal-tool ready** : RLS and multi-user support make it safe for team-wide rollout on a team’s own Supabase  
 
 ### Technical Achievements
 
@@ -553,19 +553,19 @@ async flushUpdates() {
 
 ### Open Source Impact
 
-- **MIT licensed** — freely available for commercial and personal use
-- **Full documentation** — README covers installation, configuration, architecture, and development
-- **Reproducible builds** — anyone can clone, build, and extend the extension
-- **Community interest** — 3 external contributors submitted PRs for feature requests
+- **MIT licensed** : freely available for commercial and personal use
+- **Full documentation** : README covers installation, configuration, architecture, and development
+- **Reproducible builds** : anyone can clone, build, and extend the extension
+- **Community interest** : 3 external contributors submitted PRs for feature requests
 
 ### Personal Growth
 
 This project deepened my expertise in:
 
-1. **VS Code Extension API** — mastered lifecycle hooks, webviews, SecretStorage, and authentication
-2. **Supabase & PostgreSQL** — learned Row Level Security patterns and real-time subscriptions
-3. **Distributed systems thinking** — handled session recovery, offline support, and eventual consistency
-4. **Developer experience design** — optimized for zero-config onboarding and minimal cognitive load
+1. **VS Code Extension API** : mastered lifecycle hooks, webviews, SecretStorage, and authentication
+2. **Supabase & PostgreSQL** : learned Row Level Security patterns and real-time subscriptions
+3. **Distributed systems thinking** : handled session recovery, offline support, and eventual consistency
+4. **Developer experience design** : optimized for zero-config onboarding and minimal cognitive load
 
 ---
 
@@ -573,36 +573,17 @@ This project deepened my expertise in:
 
 ### What Went Well
 
-1. **Serverless-first architecture** — Supabase eliminated months of backend work and scaled effortlessly
-2. **GitHub authentication** — leveraging platform identity removed a major onboarding barrier
-3. **Open source from day one** — forced me to write clean code and comprehensive documentation
-4. **Dogfooding** — using the extension daily caught bugs before users reported them
+1. **Serverless-first architecture** : Supabase eliminated months of backend work and scaled effortlessly
+2. **GitHub authentication** : leveraging platform identity removed a major onboarding barrier
+3. **Open source from day one** : forced me to write clean code and comprehensive documentation
+4. **Dogfooding** : using the extension daily caught bugs before users reported them
 
 ### What I'd Do Differently
 
-1. **Add analytics earlier** — I have no visibility into how users actually use the extension (which features, how long, error rates). Should have added opt-in telemetry.
-2. **Build dashboard first** — I built the tracking engine first, then realized users needed visual feedback. Should have prototyped the dashboard to validate UX before building core logic.
-3. **Support workspace-level config** — currently all settings are global (user-level). Teams want per-project Supabase configurations.
-4. **Add offline queue** — tracking continues during network outages, but data isn't persisted until reconnection. Should implement local SQLite cache with sync-on-reconnect.
-
-### Future Roadmap
-
-#### Next 3 Months
-- [ ] Add offline queue with SQLite cache
-- [ ] Implement team dashboard (aggregate time across users)
-- [ ] Support custom tags for categorizing sessions (e.g., "feature", "bugfix", "refactor")
-- [ ] Add VS Code Marketplace listing for easier installation
-
-#### Next 6 Months
-- [ ] Build web dashboard for managers (view team reports, export CSV)
-- [ ] Integrate with project management tools (Jira, Linear, GitHub Projects)
-- [ ] Add per-workspace Supabase configuration
-- [ ] Implement opt-in telemetry to understand usage patterns
-
-#### Long-term Vision
-- [ ] Support for other editors (JetBrains IDEs, Vim/Neovim)
-- [ ] AI-powered insights (e.g., "You spend 60% of time on backend code")
-- [ ] Optional integrations (e.g., billing, invoicing) for teams that need them
+1. **Add analytics earlier** : I have no visibility into how users actually use the extension (which features, how long, error rates). Should have added opt-in telemetry.
+2. **Build dashboard first** : I built the tracking engine first, then realized users needed visual feedback. Should have prototyped the dashboard to validate UX before building core logic.
+3. **Support workspace-level config** : currently all settings are global (user-level). Teams want per-project Supabase configurations.
+4. **Add offline queue** : tracking continues during network outages, but data isn't persisted until reconnection. Should implement local SQLite cache with sync-on-reconnect.
 
 ---
 
@@ -658,9 +639,9 @@ SELECT * FROM time_entries; -- Should only see user B's data
 **Question**: How long should the idle timeout be?
 
 **Approach**: I tested 3 configurations on myself over 2 weeks:
-- **3 minutes** — too aggressive; stopped tracking during code reviews and debugging
-- **10 minutes** — too lenient; counted lunch breaks and meetings
-- **5 minutes** — Goldilocks zone; caught distractions without punishing focus time
+- **3 minutes** : too aggressive; stopped tracking during code reviews and debugging
+- **10 minutes** : too lenient; counted lunch breaks and meetings
+- **5 minutes** : Goldilocks zone; caught distractions without punishing focus time
 
 **Data-driven decision**: Analyzed my own time entries and found:
 - 90% of genuine breaks were >5 minutes
@@ -676,7 +657,7 @@ SELECT * FROM time_entries; -- Should only see user B's data
 
 **Optimizations applied**:
 
-1. **Tree-shaking** — configured esbuild to eliminate unused Supabase SDK methods:
+1. **Tree-shaking** : configured esbuild to eliminate unused Supabase SDK methods:
    ```json
    {
      "esbuild": {
@@ -703,23 +684,10 @@ SELECT * FROM time_entries; -- Should only see user B's data
 
 ## Closing Thoughts
 
-Code Time Tracker was built with a clear premise: **any team with a Supabase key should be able to use it as internal developer tooling**. That meant no central backend, no hosted SaaS—just an extension that talks to the team’s own Supabase project. Onboarding stays minimal: install the extension, point it at your team’s Supabase URL and anon key, log in with GitHub, and tracking starts. That “bring your own backend” model is now my default for internal tools.
+Code Time Tracker was built with a clear premise: **any team with a Supabase key should be able to use it as internal developer tooling**. That meant no central backend, no hosted SaaS-just an extension that talks to the team’s own Supabase project. Onboarding stays minimal: install the extension, point it at your team’s Supabase URL and anon key, log in with GitHub, and tracking starts. That “bring your own backend” model is now my default for internal tools.
 
 A second lesson: **security cannot be an afterthought**. Enabling Row Level Security from day one ensured that each team’s data stays isolated in their Supabase project and that users only see their own data. Adding RLS later would have meant auditing every query and rewriting the codebase.
 
 Finally, **open source fits internal tooling**. Teams can adopt, fork, and adapt the extension without depending on a vendor. Writing for a public repo pushed better documentation, tests, and edge-case handling—and made the extension a viable option for teams that want to own their time-tracking data.
 
 ---
-
-## Want to Learn More?
-
-- **GitHub Repository**: [github.com/Aditsyal/code-time-tracker](https://github.com/Aditsyal/code-time-tracker)
-- **MIT License**: Free for personal and commercial use
-- **Contributing**: PRs welcome! See `CONTRIBUTING.md` for guidelines
-- **Questions?**: Open a GitHub issue or reach out on Twitter [@aditsyal](https://twitter.com/aditsyal)
-
----
-
-*This case study is part of my portfolio at [adityasyal.in](https://adityasyal.in). It describes an open-source extension designed so any team with a Supabase key can run time tracking as internal developer tooling.*
-
-**Tags**: #VSCode #TypeScript #Supabase #PostgreSQL #RowLevelSecurity #InternalDeveloperTooling #OpenSource #ProductEngineering

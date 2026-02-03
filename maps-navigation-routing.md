@@ -1,4 +1,4 @@
-# Case Study: 60 FPS Navigation — Optimizing Real-Time EV Routing for High Performance & Low Battery Drain
+# Case Study: 60 FPS Navigation - Optimizing Real-Time EV Routing for High Performance & Low Battery Drain
 
 > **Disclosure:** This case study focuses on frontend architecture, UI/UX challenges, and real-time state management. It omits proprietary backend logic, API keys, and exact internal metrics.
 
@@ -33,16 +33,16 @@ Navigation is high-stakes: a 500ms stutter or a jarring map jump can cause a dri
 
 ### Core Friction Points
 
-1. **Jittery Route Updates** — Re-rendering 1000+ point polylines caused visible frame drops on mid-range devices.
-2. **Disorienting Reroutes** — Instant map redraws caused "context loss," where the driver momentarily lost their sense of direction.
-3. **Main-Thread Bottlenecks** — Processing turn-by-turn instructions every 2 seconds made the UI feel sluggish to touch.
-4. **State Ambiguity** — Fragmented state logic led to race conditions (e.g., showing the "Arrived" UI while still 200m away).
+1. **Jittery Route Updates** : Re-rendering 1000+ point polylines caused visible frame drops on mid-range devices.
+2. **Disorienting Reroutes** : Instant map redraws caused "context loss," where the driver momentarily lost their sense of direction.
+3. **Main-Thread Bottlenecks** : Processing turn-by-turn instructions every 2 seconds made the UI feel sluggish to touch.
+4. **State Ambiguity** : Fragmented state logic led to race conditions (e.g., showing the "Arrived" UI while still 200m away).
 
 ### The Baseline (Pre-Optimization)
 
 - **Performance:** Rerouting dropped frames to ~45fps.
 - **Responsiveness:** 150ms tap latency during route processing.
-- **Battery:** 5–8% hourly drain (unacceptable for long trips).
+- **Battery:** 5-8% hourly drain (unacceptable for long trips).
 - **Latency:** Large routes took >500ms to render.
 
 ---
@@ -59,7 +59,7 @@ Navigation is high-stakes: a 500ms stutter or a jarring map jump can cause a dri
 ### Constraints
 
 - **Device Fragmentation:** Must perform on Android 8+ and iOS 12+ devices with limited RAM.
-- **Network Gaps:** Gracefully handle 5–30s delays in backend route updates.
+- **Network Gaps:** Gracefully handle 5-30s delays in backend route updates.
 - **Driver Context:** Touch targets must be large and text readable at a glance.
 
 ---
@@ -114,7 +114,7 @@ Navigation is high-stakes: a 500ms stutter or a jarring map jump can cause a dri
 
 ### 5. Battery Efficiency: Native Location Services
 
-**The Issue:** Continuous location polling in pure Flutter was draining 5–8% battery per hour.
+**The Issue:** Continuous location polling in pure Flutter was draining 5-8% battery per hour.
 
 **The Approach:** We bypassed generic Flutter packages in favor of custom platform channels to native iOS (CoreLocation) and Android (FusedLocationProvider) services. We implemented distance-based throttling (>50m) and automated "coarse" mode when the app is backgrounded.
 
